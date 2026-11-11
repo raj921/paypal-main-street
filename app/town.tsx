@@ -11,7 +11,8 @@ type Actor = {
 type Msg = { role: "user" | "assistant"; content: string };
 type Action = { tool: string; args: Record<string, unknown>; ok: boolean };
 
-const W = 320, H = 180, S = 3, GROUND = 132;
+const W = 320, H = 180, S = 3, GROUND = 134;
+const P = 2, TALL = 13 * P + 3; // person pixel size, and head-top offset used for bubbles and hit-tests
 const HOME = { ava: 45, mira: 161, cole: 275 };
 const GOOD = "#6fdc8c", BAD = "#ff6b6b", GOLD = "#ffcf4a";
 const money = (n: number) => "$" + n.toFixed(n % 1 ? 2 : 0);
@@ -27,7 +28,7 @@ const lookFor = (s: string) => {
   ];
 };
 const zone = (inv: Invoice) => (inv.status === "PAID" || inv.status === "MARKED_AS_PAID" ? "paid" : inv.overdue ? "overdue" : "open");
-const ZONES = { overdue: [12, 78], open: [208, 236], paid: [120, 200] } as const;
+const ZONES = { overdue: [10, 92], open: [206, 242], paid: [118, 204] } as const;
 
 function staff(kind: "ava" | "mira" | "cole", name: string, look: string[]): Actor {
   return { id: kind, name, kind, x: HOME[kind], tx: HOME[kind], home: HOME[kind], dy: 0, look, script: [] };
@@ -65,7 +66,7 @@ export default function Town() {
     const counts = { overdue: 0, open: 0, paid: 0 };
     for (const inv of list) {
       const z = zone(inv), [a, b] = ZONES[z], i = counts[z]++;
-      const home = a + ((i * 13) % (b - a));
+      const home = a + ((i * 19) % (b - a));
       let actor = map.get(inv.id);
       if (!actor) {
         actor = { id: inv.id, name: inv.name, kind: "folk", x: first ? home : -8, tx: home, home, dy: (i % 3) * 3, look: lookFor(inv.email || inv.name), script: [] };
@@ -89,7 +90,7 @@ export default function Town() {
 
   function burst(x: number) {
     const now = performance.now();
-    for (let i = 0; i < 8; i++) coins.current.push({ x: x - 6 + Math.random() * 12, y: GROUND - 16, vy: -0.4 - Math.random() * 0.5, until: now + 900 + Math.random() * 400 });
+    for (let i = 0; i < 8; i++) coins.current.push({ x: x - 6 + Math.random() * 12, y: GROUND - TALL, vy: -0.4 - Math.random() * 0.5, until: now + 900 + Math.random() * 400 });
   }
 
   function animate(actions: Action[]) {
@@ -98,12 +99,12 @@ export default function Town() {
       if (a.tool === "send_invoice_reminder") {
         const t = m.get(String(a.args.invoice_id));
         ava.script.push(
-          { x: (t?.x ?? 60) + 7, say: a.ok ? "Friendly reminder sent" : "Reminder failed", color: a.ok ? "#fff" : BAD, ms: 1500,
-            onArrive: () => t && (t.bubble = { text: a.ok ? "Oh! Paying soon" : "?", until: performance.now() + 2200, color: "#fff" }) },
+          { x: (t?.x ?? 60) + 8 * P, say: a.ok ? "Friendly reminder sent" : "Reminder failed", color: a.ok ? "#fff" : BAD, ms: 2600,
+            onArrive: () => t && (t.bubble = { text: a.ok ? "Oh! Paying soon" : "?", until: performance.now() + 3600, color: "#fff" }) },
           { x: HOME.ava },
         );
       } else if (a.tool === "create_invoice" || a.tool === "send_invoice") {
-        ava.script.push({ x: HOME.mira - 8, say: a.tool === "create_invoice" ? "Invoice drafted" : "Invoice sent", ms: 1200 }, { x: HOME.ava });
+        ava.script.push({ x: HOME.mira - 8 * P, say: a.tool === "create_invoice" ? "Invoice drafted" : "Invoice sent", ms: 1200 }, { x: HOME.ava });
       } else if (a.tool.includes("shipment")) {
         cole.script.push({ say: "Parcel tracked!", ms: 700 }, { x: 340 }, { ms: 1200 }, { x: HOME.cole, say: "Tracking is live", ms: 1400 });
       } else {
@@ -147,7 +148,8 @@ export default function Town() {
   function hit(e: React.MouseEvent<HTMLCanvasElement>) {
     const r = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - r.left) / r.width) * W, y = ((e.clientY - r.top) / r.height) * H;
-    return [...actors.current.values()].find((a) => Math.abs(a.x - x) < 5 && y > GROUND + a.dy - 16 && y < GROUND + a.dy + 1);
+    // topmost (front-most) person wins when sprites overlap
+    return [...actors.current.values()].sort((a, b) => b.dy - a.dy).find((a) => Math.abs(a.x - x) < 4 * P && y > GROUND + a.dy - TALL && y < GROUND + a.dy + 2);
   }
 
   async function inspect(inv: Invoice) {
@@ -350,8 +352,8 @@ function draw(ctx: CanvasRenderingContext2D, now: number, night: boolean, font: 
   const sorted = [...list].sort((a, b) => a.dy - b.dy);
   for (const a of sorted) person(r, a, now);
   for (const a of sorted) {
-    const y = GROUND + a.dy - 16;
-    if (a.inv?.overdue && !a.bubble) { r(a.x - 1, y - 6, 2, 4, BAD); r(a.x - 1, y - 1, 2, 1, BAD); }
+    const y = GROUND + a.dy - TALL;
+    if (a.inv?.overdue && !(a.bubble && now < a.bubble.until)) { r(a.x - 1, y - 7, 3, 5, BAD); r(a.x - 1, y - 1, 3, 2, BAD); }
     if (a.bubble && now < a.bubble.until) bubble(ctx, a.bubble.text, a.x, y - 2, a.bubble.color, font);
     else if (hoverId === a.id) bubble(ctx, a.inv ? `${a.name} · ${money(a.inv.amount)}` : a.name, a.x, y - 2, "#fff", font);
   }
@@ -375,9 +377,12 @@ function step(a: Actor, now: number) {
   a.x += Math.sign(d) * Math.min(Math.abs(d), a.kind === "folk" ? 0.45 : 0.7);
 }
 
-function person(r: (x: number, y: number, w: number, h: number, c: string) => void, a: Actor, now: number) {
+function person(draw: (x: number, y: number, w: number, h: number, c: string) => void, a: Actor, now: number) {
   const [hair, skin, shirt, pants] = a.look;
-  const x = Math.round(a.x) - 3, y = GROUND + a.dy - 13;
+  // sprite is designed on a 7x13 grid; each grid pixel is drawn P world pixels wide
+  const ox = Math.round(a.x) - Math.round(3.5 * P), oy = GROUND + a.dy - 13 * P;
+  const r = (dx: number, dy: number, w: number, h: number, c: string) => draw(ox + dx * P, oy + dy * P, w * P, h * P, c);
+  const x = 0, y = 0;
   const walking = Math.abs(a.tx - a.x) > 0.6, f = walking ? Math.floor(now / 140) % 2 : 0;
   const bob = f;
   r(x + 1, y + 13, 6, 1, "rgba(0,0,0,.25)");
@@ -386,7 +391,7 @@ function person(r: (x: number, y: number, w: number, h: number, c: string) => vo
   r(x, y + 5, 7, 4, shirt); r(x, y + 8, 1, 1, skin); r(x + 6, y + 8, 1, 1, skin);
   r(x + 1, y + 9, 2, f ? 3 : 4, pants); r(x + 4, y + 9, 2, f ? 4 : 3, pants);
   if (a.kind === "mira") { r(x + 1, y - 2, 5, 2, "#ffffff"); r(x + 2, y + 5, 3, 4, "#ffffff"); }
-  if (a.kind === "ava") { r(x + 1, y + 3, 5, 1, "#2a2a2a"); r(x + 6, y + 5, 2, 3, "#f3ead8"); }
+  if (a.kind === "ava") { r(x + 1, y + 3 + bob, 5, 1, "#2a2a2a"); r(x + 6, y + 5, 2, 3, "#f3ead8"); }
   if (a.kind === "cole") { r(x, y - 1, 6, 2, "#e76f51"); if (a.script.length) r(x + 5, y + 5, 4, 4, "#c8955a"); }
 }
 
