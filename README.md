@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Main Street
 
-## Getting Started
+Your PayPal account, run as a pixel town. Every customer you invoice is a person on the street, and AI staff do the PayPal work while you watch.
 
-First, run the development server:
+- Overdue invoices stand on the left side of the street with a red "!".
+- Open invoices wait by the bench.
+- Paid customers hang around the bakery. When an invoice gets paid, that person walks into the shop and coins pop.
+- Click anyone to see the real PayPal invoice behind them, with PayPal's own QR code and pay page.
+- Tell Mira, the manager, what you need ("chase everyone overdue over $50"). She calls PayPal through the Agent Toolkit, and you see Ava the accountant walk over to each debtor as each reminder goes out.
+
+**Who it's for:** small shop owners who don't read payment dashboards and don't trust an AI touching their money where they can't see it. Main Street shows every action on screen as a person doing a job.
+
+## Run it
 
 ```bash
+npm install
+cp .env.example .env.local   # add your PayPal sandbox app keys and an Anthropic API key
+npm run seed                 # creates Hearth Bakery's overdue, open and paid invoices in your sandbox
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run seed` cancels the open invoices first, so you can run it again for a fresh street.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How PayPal and AI are used
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Piece | What it does |
+|---|---|
+| PayPal Agent Toolkit (`@paypal/agent-toolkit/openai`) | Mira's tools: invoices (list, search, create, send, remind, QR), shipment tracking, orders, products, plans, transactions, merchant insights. Delete, cancel and refund are switched off because the demo URL is public. |
+| PayPal Invoicing v2 REST | The town polls invoices every 4 s; `generate-qr-code` shows the QR code; the seed script records cash payments for the regulars. |
+| Claude Haiku 5.5 (`@anthropic-ai/sdk`) | Mira's brain: reads the request, picks PayPal tools, and loops until the job is done. The current invoice list goes into its prompt so it can act in one step. |
 
-## Learn More
+Sandbox only. Note: PayPal blocks invoices to India-based buyer accounts, so pay the demo invoice with a US sandbox personal account.
 
-To learn more about Next.js, take a look at the following resources:
+## Hackathon checklist (PayPal AI Hackathon on Devpost)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Deadline: **12 Nov 2026, 3:00 pm EST** (12:00 pm PT, 01:30 IST on 13 Nov). Don't change the repo after the deadline.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Submission needs:
+- [ ] Text description of features and functionality
+- [ ] Functional demo: hosted URL or full run instructions (this README)
+- [ ] Tools used: which models and AI services, and how
+- [ ] Public GitHub repo with all code and an open-source licence shown in the About section
+- [ ] Demo video under 3 minutes on YouTube, public, showing it working end to end, with no third-party music or trademarks used without permission
 
-## Deploy on Vercel
+Judged on: technological implementation, design, potential impact, innovation, presentation.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Licence
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
+/* Day town in light mode, lamplit night town in dark mode. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #f6efe0;
+  --panel: #fffaf0;
+  --ink: #1f1a14;
+  --muted: #6b6256;
+  --line: #e5dac3;
+  --accent: #d9822b;
+  --pp: #1e5bd8;
+  --good: #2f9e57;
+  --bad: #d64545;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #0d1020;
+    --panel: #151a33;
+    --ink: #f3ead8;
+    --muted: #9aa3c7;
+    --line: #262d52;
+    --accent: #ffb547;
+    --pp: #5b8dff;
+    --good: #6fdc8c;
+    --bad: #ff6b6b;
   }
 }
 
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-pp: var(--pp);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
+  --font-pixel: var(--font-pixelify);
+  --font-sans: var(--font-sans-body);
+  --font-mono: var(--font-plex-mono);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans-body), system-ui, sans-serif;
 }
