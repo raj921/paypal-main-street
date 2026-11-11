@@ -19,7 +19,7 @@ npm run seed                 # creates Hearth Bakery's overdue, open and paid in
 npm run dev
 ```
 
-`npm run seed` cancels the open invoices first, so you can run it again for a fresh street.
+`npm run seed` cancels the open invoices first, so you can run it again for a fresh street. Each customer appears once, as their most recent invoice.
 
 ## How PayPal and AI are used
 

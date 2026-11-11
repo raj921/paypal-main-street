@@ -55,5 +55,10 @@ export function toInvoice(i: any, today = new Date().toISOString().slice(0, 10))
 
 export async function getInvoices(): Promise<Invoice[]> {
   const data = await paypal("/v2/invoicing/invoices?page_size=50&total_required=false&fields=all");
-  return (data.items ?? []).map((i: unknown) => toInvoice(i)).filter((i: Invoice) => i.status !== "DRAFT" && i.status !== "CANCELLED");
+  // One townsperson per customer: PayPal lists newest first, so keep each customer's latest live invoice.
+  const seen = new Set<string>();
+  return (data.items ?? [])
+    .map((i: unknown) => toInvoice(i))
+    .filter((i: Invoice) => i.status !== "DRAFT" && i.status !== "CANCELLED")
+    .filter((i: Invoice) => { const k = (i.email || i.name).toLowerCase(); return seen.has(k) ? false : (seen.add(k), true); });
 }
