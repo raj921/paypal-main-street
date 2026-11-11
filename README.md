@@ -2,11 +2,11 @@
 
 Your PayPal account, run as a pixel town. Every customer you invoice is a person on the street, and AI staff do the PayPal work while you watch.
 
-- Overdue invoices stand on the left side of the street with a red "!".
-- Open invoices wait by the bench.
-- Paid customers hang around the bakery. When an invoice gets paid, that person walks into the shop and coins pop.
-- Click anyone to see the real PayPal invoice behind them, with PayPal's own QR code and pay page.
-- Tell Mira, the manager, what you need ("chase everyone overdue over $50"). She calls PayPal through the Agent Toolkit, and you see Ava the accountant walk over to each debtor as each reminder goes out.
+- Overdue invoices stand on the left of the street with a red "!". Open invoices wait by the post office. Paid customers hang around the bakery.
+- When an invoice gets paid, that person walks into the shop, fireworks go off, and the town vault's display ticks up. The vault always shows the money actually collected.
+- Click anyone to see the real PayPal invoice behind them: amount, due date, PayPal's own QR code and pay page, plus one-click "Send Ava over" (reminder) and "Paid in cash" (record payment).
+- Tell Mira, the manager, what you need ("chase everyone overdue over $50"). She calls PayPal through the Agent Toolkit, and Ava the accountant walks over to each debtor as each reminder goes out.
+- Day and night themes, sound effects with a mute button, and a layout that works on a phone.
 
 **Who it's for:** small shop owners who don't read payment dashboards and don't trust an AI touching their money where they can't see it. Main Street shows every action on screen as a person doing a job.
 
@@ -25,7 +25,7 @@ npm run dev
 
 | Piece | What it does |
 |---|---|
-| PayPal Agent Toolkit (`@paypal/agent-toolkit/openai`) | Mira's tools: invoices (list, search, create, send, remind, QR), shipment tracking, orders, products, plans, transactions, merchant insights. Delete, cancel and refund are switched off because the demo URL is public. |
+| PayPal Agent Toolkit (`@paypal/agent-toolkit/openai`) | Mira's tools: invoices (list, search, create, send, remind, record payment, QR), shipment tracking, orders, products, plans, transactions, merchant insights. Delete, cancel and refund are switched off because the demo URL is public. |
 | PayPal Invoicing v2 REST | The town polls invoices every 4 s; `generate-qr-code` shows the QR code; the seed script records cash payments for the regulars. |
 | Claude Haiku 5.5 (`@anthropic-ai/sdk`) | Mira's brain: reads the request, picks PayPal tools, and loops until the job is done. The current invoice list goes into its prompt so it can act in one step. |
 

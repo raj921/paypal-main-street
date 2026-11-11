@@ -6,7 +6,7 @@ export const toolkit = new PayPalAgentToolkit({
   clientSecret: process.env.PAYPAL_CLIENT_SECRET!,
   configuration: {
     actions: {
-      invoices: { create: true, list: true, get: true, send: true, sendReminder: true, search: true, generateQRC: true, generateInvoiceNumber: true },
+      invoices: { create: true, list: true, get: true, send: true, sendReminder: true, search: true, generateQRC: true, generateInvoiceNumber: true, recordPayment: true },
       shipment: { create: true, get: true },
       orders: { create: true, get: true },
       products: { list: true, show: true },

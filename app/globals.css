@@ -1,29 +1,49 @@
 @import "tailwindcss";
 
-/* Day town in light mode, lamplit night town in dark mode. */
+/* Day town in light mode, neon dusk in dark mode. The toggle sets data-theme; without it the OS setting wins. */
 :root {
-  --bg: #f6efe0;
-  --panel: #fffaf0;
-  --ink: #1f1a14;
-  --muted: #6b6256;
-  --line: #e5dac3;
-  --accent: #d9822b;
-  --pp: #1e5bd8;
-  --good: #2f9e57;
-  --bad: #d64545;
+  --bg: #fff4dc;
+  --panel: rgba(255, 250, 236, 0.94);
+  --panel-solid: #fffaec;
+  --ink: #2a1540;
+  --muted: #6f5c8a;
+  --line: #2a1540;
+  --shadow: #2a1540;
+  --accent: #ff9a1f;
+  --hot: #ff2f86;
+  --pp: #1456d6;
+  --good: #0c9a52;
+  --bad: #e22d4b;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d1020;
-    --panel: #151a33;
-    --ink: #f3ead8;
-    --muted: #9aa3c7;
-    --line: #262d52;
-    --accent: #ffb547;
-    --pp: #5b8dff;
-    --good: #6fdc8c;
-    --bad: #ff6b6b;
+  :root:not([data-theme="light"]) {
+    --bg: #0b0530;
+    --panel: rgba(24, 12, 64, 0.9);
+    --panel-solid: #180c40;
+    --ink: #fff6e6;
+    --muted: #b9abf0;
+    --line: #5a43c0;
+    --shadow: #05001c;
+    --accent: #ffc247;
+    --hot: #ff4f9a;
+    --pp: #7db4ff;
+    --good: #52ffa8;
+    --bad: #ff5c7a;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #0b0530;
+  --panel: rgba(24, 12, 64, 0.9);
+  --panel-solid: #180c40;
+  --ink: #fff6e6;
+  --muted: #b9abf0;
+  --line: #5a43c0;
+  --shadow: #05001c;
+  --accent: #ffc247;
+  --hot: #ff4f9a;
+  --pp: #7db4ff;
+  --good: #52ffa8;
+  --bad: #ff5c7a;
 }
 
 @theme inline {
@@ -33,6 +53,7 @@
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-accent: var(--accent);
+  --color-hot: var(--hot);
   --color-pp: var(--pp);
   --color-good: var(--good);
   --color-bad: var(--bad);
@@ -45,4 +66,99 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans-body), system-ui, sans-serif;
+}
+
+/* Chunky game-UI surfaces: thick outline plus a hard offset shadow. */
+.panel {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 4px 4px 0 var(--shadow);
+  backdrop-filter: blur(8px);
+}
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+  transition: transform 80ms, box-shadow 80ms;
+}
+.btn {
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-solid);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--shadow);
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-pixelify), monospace;
+  font-size: 0.95rem;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: transform 80ms, box-shadow 80ms, filter 80ms;
+}
+.btn-accent { background: var(--accent); color: #2a1540; }
+.btn-hot { background: var(--hot); color: #fff; }
+.btn:hover:not(:disabled), .icon-btn:hover { filter: brightness(1.08); transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--shadow); }
+.btn:active:not(:disabled), .icon-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--shadow); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.chip {
+  flex-shrink: 0;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.75rem;
+  color: var(--ink);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+.chip:hover:not(:disabled) { background: var(--hot); border-color: var(--hot); color: #fff; }
+.chip:disabled { opacity: 0.5; }
+.field {
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-solid);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.field::placeholder { color: var(--muted); }
+.badge {
+  border: 2px solid var(--shadow);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-pixelify), monospace;
+  font-size: 0.85rem;
+  color: #12082a;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+.face { border: 2px solid var(--line); border-radius: 6px; box-shadow: 3px 3px 0 var(--shadow); }
+:is(.btn, .chip, .field, .icon-btn, a):focus-visible { outline: 3px solid var(--hot); outline-offset: 2px; }
+.dialog { box-shadow: 0 -6px 0 var(--shadow); }
+
+/* Opening title: letters drop in, hold, then clear the stage. */
+.intro { animation: intro-out 600ms 2600ms forwards; background: radial-gradient(ellipse at center, rgba(11, 5, 48, 0.55), rgba(11, 5, 48, 0) 70%); }
+.intro-title {
+  font-size: clamp(2.6rem, 11vw, 9rem);
+  line-height: 1;
+  color: #fff6e6;
+  text-shadow: 0.05em 0.05em 0 #ff4f9a, 0.1em 0.1em 0 #3ee7ff, 0.15em 0.15em 0 #12082a;
+}
+.intro-title span { display: inline-block; animation: drop 520ms cubic-bezier(0.2, 1.4, 0.4, 1) backwards; }
+.intro-sub { text-shadow: 0 2px 0 #12082a; animation: rise 500ms 800ms backwards; }
+@keyframes drop { from { transform: translateY(-1.2em) rotate(-8deg); opacity: 0; } }
+@keyframes rise { from { transform: translateY(0.6em); opacity: 0; } }
+@keyframes intro-out { to { opacity: 0; visibility: hidden; transform: scale(1.06); } }
+
+.record { animation: pop 220ms cubic-bezier(0.2, 1.4, 0.4, 1); }
+.ledger-row { animation: slide 260ms ease-out; }
+@keyframes pop { from { transform: scale(0.92) translateY(8px); opacity: 0; } }
+@keyframes slide { from { transform: translateX(-16px); opacity: 0; } }
+.dots::after { content: ""; animation: dots 1.2s steps(4) infinite; }
+@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro { display: none; }
+  .record, .ledger-row, .intro-title span, .intro-sub { animation: none; }
 }
