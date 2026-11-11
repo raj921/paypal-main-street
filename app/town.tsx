@@ -12,7 +12,7 @@ type Log = { id: number; t: string; text: string; tone?: "good" | "bad" };
 
 const staffActor = (kind: "ava" | "mira" | "cole"): Actor =>
   ({ id: kind, name: `${STAFF[kind].name} · ${STAFF[kind].role.toLowerCase()}`, kind, x: HOME[kind], tx: HOME[kind], home: HOME[kind], dy: kind === "mira" ? -2 : 0, look: STAFF[kind].look, script: [] });
-const PROMPTS = ["Chase everyone overdue over $50", "Bill Sam Lee $18 for a sourdough box", "Who owes us the most?"];
+const PROMPTS = ["Chase everyone overdue over $50", "Bill Sam Lee (sam.lee@example.com) $18 for a sourdough box", "Who owes us the most?"];
 
 export default function Town() {
   const canvas = useRef<HTMLCanvasElement>(null);

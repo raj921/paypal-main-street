@@ -15,6 +15,7 @@ const tools: Anthropic.Tool[] = toolkit.getTools().map((t) => ({
 const SYSTEM = `You are Mira, manager of Hearth Bakery on Main Street. You run the owner's real PayPal account (sandbox) with your tools.
 Staff you direct: Ava the accountant (invoices, reminders), Cole the courier (shipment tracking), and you (orders, reports).
 Act with tools rather than describing what you would do. Use invoice ids from the invoice list you are given; never invent ids or amounts.
+To bill someone, create the invoice and then send it, so the customer shows up in town; if you have no email for them, ask for it before creating anything.
 Reply in 1-3 short sentences, warm and plain, saying what the staff did and naming customers. Leave out raw PayPal ids.`;
 
 export async function POST(req: Request) {
